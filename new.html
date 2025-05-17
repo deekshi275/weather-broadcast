@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agricultural News</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-color: #00b4db;
+            --secondary-color: #0083b0;
+            --background-dark: #1a1a1a;
+            --card-bg: rgba(30, 30, 30, 0.9);
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            min-height: 100vh;
+            color: var(--text-primary);
+            position: relative;
+            overflow-x: hidden;
+            background-color: var(--background-dark);
+        }
+
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+
+        .navbar {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: flex-start;
+            gap: 2rem;
+            list-style: none;
+            padding-left: 2rem;
+            margin: 0;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-links a.active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .news-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .news-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .news-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .category-badge {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-secondary);
+        }
+
+        .footer {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 3rem 0 1rem 0;
+            margin-top: 3rem;
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .footer-section p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .footer-section ul li i {
+            margin-right: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .footer-section a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: var(--primary-color);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-links a {
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 2rem auto 0;
+            padding: 1rem 20px;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+        }
+
+        .footer-bottom p {
+            margin: 0.5rem 0;
+        }
+
+        .footer-bottom a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .footer-bottom a:hover {
+            text-decoration: underline;
+        }
+
+        .text-muted {
+            color: var(--text-secondary) !important;
+        }
+
+        .btn-outline-success {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-outline-success:hover {
+            background-color: var(--primary-color);
+            color: var(--background-dark);
+        }
+
+        .alert {
+            background: var(--card-bg);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .alert-danger {
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+
+        .alert-info {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .spinner-border {
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            .news-container {
+                padding: 15px;
+            }
+
+            .news-card {
+                margin-bottom: 15px;
+            }
+
+            .nav-links {
+                gap: 1rem;
+                padding-left: 1rem;
+            }
+
+            .footer-content {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    <div class="overlay"></div>
+    <header class="header">
+        <h1>Weather Dashboard For Framing</h1>
+        <p>Get accurate weather data and crop recommendations for your location</p>
+    </header>
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="crop.html"><i class="fas fa-seedling "></i> Crop Search</a></li>
+            <li><a href="deatailsofcrop.html" ><i class="fas fa-chart-line"></i> Analytics</a></li>
+            <li><a href="bot.html" ><i class="fas fa-robot"></i> AI Assistant</a></li>
+            <li><a href="new.html" class="active"><i class="fas fa-newspaper"></i> News</a></li>
+            <li><a href="cropgrow.html"><i class="fas fa-newspaper"></i> Average Climate</a></li>
+        </ul>
+    </nav>
+
+    <div class="header">
+        <h1><i class="fas fa-seedling"></i> Agricultural And Weather News</h1>
+        <p>Stay updated with the latest news in agriculture, crops, and farming</p>
+    </div>
+
+    <div class="news-container">
+        <div id="news-content">
+            <div class="loading">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p>Loading news...</p>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>About Weather Dashboard</h3>
+                <p>Real-time weather information powered by OpenWeather API. Get accurate forecasts and current weather conditions for any location worldwide.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="#"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="#"><i class="fas fa-cloud-sun"></i> Forecast</a></li>
+                    <li><a href="#"><i class="fas fa-map-marked-alt"></i> Maps</a></li>
+                    <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Weather Data</h3>
+                <ul>
+                    <li><i class="fas fa-temperature-high"></i> Temperature</li>
+                    <li><i class="fas fa-wind"></i> Wind Speed</li>
+                    <li><i class="fas fa-tint"></i> Humidity</li>
+                    <li><i class="fas fa-cloud-rain"></i> Rainfall</li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Connect With Us</h3>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Weather Dashboard. All rights reserved.</p>
+            <p>Data provided by <a href="https://openweathermap.org/" target="_blank">OpenWeather</a></p>
+        </div>
+    </footer>
+    
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Function to fetch news from NewsAPI
+        async function fetchNews() {
+            try {
+                // Query focusing on Indian farming and weather news
+                const query = '(India farming weather OR "Indian farm weather" OR "Indian agricultural weather" OR "Indian crop weather" OR "Indian farming forecast" OR "Indian agricultural forecast" OR "Indian farm conditions" OR "Indian crop conditions")';
+                const response = await fetch(`https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&language=en&sortBy=publishedAt&apiKey=cd364ff0d6424f579fcd19b515df8f87`);
+                const data = await response.json();
+                
+                // Enhanced filtering for Indian farming and weather relevance
+                const relevantArticles = data.articles.filter(article => {
+                    const title = article.title.toLowerCase();
+                    const description = article.description ? article.description.toLowerCase() : '';
+                    const content = article.content ? article.content.toLowerCase() : '';
+                    
+                    const indiaKeywords = [
+                        'india', 'indian', 'delhi', 'mumbai', 'kolkata', 'chennai',
+                        'bangalore', 'hyderabad', 'punjab', 'haryana', 'uttar pradesh',
+                        'maharashtra', 'gujarat', 'karnataka', 'tamil nadu'
+                    ];
+                    
+                    const farmingKeywords = [
+                        'farming', 'farm', 'agriculture', 'crop', 'harvest',
+                        'cultivation', 'irrigation', 'fertilizer', 'pesticide',
+                        'soil', 'farmer', 'agricultural', 'kisan', 'mandi'
+                    ];
+                    
+                    const weatherKeywords = [
+                        'weather', 'forecast', 'rainfall', 'temperature',
+                        'climate', 'drought', 'flood', 'storm', 'precipitation',
+                        'humidity', 'wind', 'seasonal', 'monsoon'
+                    ];
+                    
+                    // Article must contain at least one keyword from each category
+                    const hasIndiaKeyword = indiaKeywords.some(keyword => 
+                        title.includes(keyword) || 
+                        description.includes(keyword) || 
+                        content.includes(keyword)
+                    );
+                    
+                    const hasFarmingKeyword = farmingKeywords.some(keyword => 
+                        title.includes(keyword) || 
+                        description.includes(keyword) || 
+                        content.includes(keyword)
+                    );
+                    
+                    const hasWeatherKeyword = weatherKeywords.some(keyword => 
+                        title.includes(keyword) || 
+                        description.includes(keyword) || 
+                        content.includes(keyword)
+                    );
+                    
+                    return hasIndiaKeyword && hasFarmingKeyword && hasWeatherKeyword;
+                });
+                
+                displayNews(relevantArticles);
+            } catch (error) {
+                console.error('Error fetching news:', error);
+                document.getElementById('news-content').innerHTML = '<div class="alert alert-danger">Error loading news. Please try again later.</div>';
+            }
+        }
+
+        // Function to display news
+        function displayNews(articles) {
+            const newsContent = document.getElementById('news-content');
+            newsContent.innerHTML = '';
+
+            if (articles.length === 0) {
+                newsContent.innerHTML = '<div class="alert alert-info">No relevant Indian farming and weather news found. Please try again later.</div>';
+                return;
+            }
+
+            articles.forEach(article => {
+                const newsCard = `
+                    <div class="news-card">
+                        <img src="${article.urlToImage || 'https://via.placeholder.com/400x200?text=Indian+Farming+Weather+News'}" 
+                             class="news-image" alt="${article.title}">
+                        <div class="p-3">
+                            <span class="category-badge">Indian Farming & Weather</span>
+                            <h5 class="mt-2">${article.title}</h5>
+                            <p class="text-muted">${article.description}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">${new Date(article.publishedAt).toLocaleDateString()}</small>
+                                <a href="${article.url}" target="_blank" class="btn btn-outline-success btn-sm">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                newsContent.innerHTML += newsCard;
+            });
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchNews();
+        });
+    </script>
+</body>
+</html>

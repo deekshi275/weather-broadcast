@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vegetable Growing Season Finder</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-color: #00b4db;
+            --secondary-color: #0083b0;
+            --background-dark: #1a1a1a;
+            --card-bg: rgba(30, 30, 30, 0.9);
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --input-bg: rgba(0, 0, 0, 0.3);
+            --hover-bg: rgba(255, 255, 255, 0.1);
+            --shadow-color: rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--background-dark);
+            color: var(--text-primary);
+            position: relative;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+
+        .navbar {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: flex-start;
+            gap: 2rem;
+            list-style: none;
+            padding-left: 2rem;
+            margin: 0;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links a:hover {
+            background: var(--hover-bg);
+        }
+
+        .nav-links a.active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .header h1 {
+            color: var(--text-primary);
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            margin: 0 auto;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+            width: 100%;
+            max-width: 800px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.8s ease-out;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: var(--text-primary);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .recommendation-heading {
+            text-align: center;
+            color: var(--text-primary);
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 2rem 0;
+            padding: 1rem;
+            background: var(--card-bg);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .recommendation-heading span {
+            color: var(--primary-color);
+        }
+
+        .search-container h2 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            color: var(--text-primary);
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .search-container p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            animation: fadeIn 0.8s ease-out 0.2s backwards;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            background: var(--input-bg);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px rgba(0, 180, 219, 0.2);
+        }
+
+        .search-box input::placeholder {
+            color: #444;
+        }
+
+        .search-box button {
+            padding: 15px 30px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box button:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 131, 176, 0.3);
+        }
+
+        .result-container {
+            margin-top: 30px;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            display: none;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .vegetable-info {
+            margin-bottom: 30px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .vegetable-info h2 {
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .vegetable-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .detail-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .detail-item:hover {
+            transform: none;
+            box-shadow: none;
+            border-color: var(--border-color);
+        }
+
+        .detail-item h3 {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .detail-item p {
+            font-size: 20px;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .growing-info {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-top: 30px;
+        }
+
+        .growing-info:hover {
+            transform: none;
+            box-shadow: none;
+            border-color: var(--border-color);
+        }
+
+        .growing-info h2 {
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .growing-info p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .optimal-months {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .month-tag {
+            background: var(--primary-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .month-tag:hover {
+            transform: none;
+            box-shadow: none;
+            background: var(--primary-color);
+        }
+
+        .error {
+            color: #ff4444;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+            padding: 15px;
+            background: rgba(255, 68, 68, 0.1);
+            border-radius: 8px;
+            border: 1px solid #ff4444;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .loading {
+            text-align: center;
+            margin: 20px 0;
+            display: none;
+            color: var(--primary-color);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .loading::after {
+            content: "Loading...";
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { content: "Loading."; }
+            33% { content: "Loading.."; }
+            66% { content: "Loading..."; }
+        }
+
+        .vegetable-image {
+            width: 100%;
+            max-width: 250px;
+            height: auto;
+            border-radius: 10px;
+            margin: 20px auto;
+            display: block;
+            border: 2px solid var(--border-color);
+        }
+
+        .vegetable-image:hover {
+            transform: none;
+            box-shadow: none;
+            border-color: var(--border-color);
+        }
+
+        .footer {
+            background: var(--card-bg);
+            padding: 3rem 2rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .footer-section p, .footer-section ul li {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .footer-section ul li a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section ul li a:hover {
+            color: var(--primary-color);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-links a {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer-bottom p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-bottom a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-bottom a:hover {
+            color: var(--secondary-color);
+        }
+
+        @media (max-width: 768px) {
+            .footer {
+                padding: 2rem 1rem 1rem;
+            }
+
+            .footer-content {
+                gap: 1.5rem;
+            }
+
+            .footer-section {
+                text-align: center;
+            }
+
+            .social-links {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    <div class="overlay"></div>
+    
+    <header class="header">
+        <h1>Weather Dashboard For Farming</h1>
+        <p>Your Vegetable Growing Season Guide</p>
+    </header>
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="crop.html"><i class="fas fa-seedling"></i> Crop Search</a></li>
+            <li><a href="deatailsofcrop.html" class="active"><i class="fas fa-chart-line"></i> Analytics</a></li>
+            <li><a href="bot.html"><i class="fas fa-robot"></i> AI Assistant</a></li>
+            <li><a href="new.html"><i class="fas fa-newspaper"></i> News</a></li>
+            <li><a href="cropgrow.html"><i class="fas fa-newspaper"></i> Average Climate</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <div class="container">
+            <h1>Vegetable Growing Season Finder</h1>
+            <div class="search-container">
+                <h2>Search for a Vegetable</h2>
+                <p>Enter the name of the vegetable you're interested in:</p>
+            </div>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Enter vegetable name (e.g., Tomato, Carrot, Broccoli)">
+                <button id="searchButton">Search</button>
+            </div>
+            <div class="loading"></div>
+            <div class="error"></div>
+            <div class="result-container">
+                <div class="vegetable-info">
+                    <h2 class="vegetable-name"></h2>
+                    <img class="vegetable-image" src="" alt="Vegetable image">
+                    <div class="vegetable-details">
+                        <div class="detail-item">
+                            <h3>Best Growing Temperature</h3>
+                            <p class="temperature"></p>
+                        </div>
+                        <div class="detail-item">
+                            <h3>Optimal Humidity</h3>
+                            <p class="humidity"></p>
+                        </div>
+                        <div class="detail-item">
+                            <h3>Days to Harvest</h3>
+                            <p class="harvest-time"></p>
+                        </div>
+                        <div class="detail-item">
+                            <h3>Difficulty Level</h3>
+                            <p class="difficulty"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="growing-info">
+                    <h2>Growing Information</h2>
+                    <p class="growing-tips"></p>
+                    <h3>Best Months for Growing:</h3>
+                    <div class="optimal-months"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>About Weather Dashboard</h3>
+                <p>Real-time weather information powered by OpenWeather API. Get accurate forecasts and current weather conditions for any location worldwide.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="crop.html"><i class="fas fa-seedling"></i> Crop Search</a></li>
+                    <li><a href="deatailsofcrop.html"><i class="fas fa-chart-line"></i> Analytics</a></li>
+                    <li><a href="bot.html"><i class="fas fa-robot"></i> AI Assistant</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Weather Data</h3>
+                <ul>
+                    <li><i class="fas fa-temperature-high"></i> Temperature</li>
+                    <li><i class="fas fa-wind"></i> Wind Speed</li>
+                    <li><i class="fas fa-tint"></i> Humidity</li>
+                    <li><i class="fas fa-cloud-rain"></i> Rainfall</li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Connect With Us</h3>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Weather Dashboard For Farming. All rights reserved.</p>
+            <p>Data provided by <a href="https://openweathermap.org/" target="_blank">OpenWeather</a></p>
+        </div>
+    </footer>
+
+    <script>
+        // Vegetable database
+        const VEGETABLE_DATABASE = {
+            'tomato': {
+                name: 'Tomato',
+                image: 'https://images.pexels.com/photos/1327838/pexels-photo-1327838.jpeg?cs=srgb&dl=pexels-julia-nagy-568948-1327838.jpg&fm=jpg',
+                temperature: '15-30°C',
+                humidity: '40-70%',
+                harvestTime: '60-90 days',
+                difficulty: 'Moderate',
+                bestMonths: ['March', 'April', 'May', 'June', 'September', 'October'],
+                tips: 'Tomatoes need full sun and well-drained soil. Water regularly and provide support for the vines.'
+            },
+            'carrot': {
+                name: 'Carrot',
+                image: 'https://media.istockphoto.com/id/185275579/photo/bundles-of-organic-carrots-with-the-stems-still-attached.jpg?s=612x612&w=0&k=20&c=OIdIDUtDF9jxpCFnZlb7ld5tOj8pDMol1XIcfsHFlEk=',
+                temperature: '10-25°C',
+                humidity: '50-70%',
+                harvestTime: '70-80 days',
+                difficulty: 'Easy',
+                bestMonths: ['February', 'March', 'April', 'September', 'October'],
+                tips: 'Carrots prefer loose, sandy soil. Keep the soil moist and thin seedlings for better growth.'
+            },
+            'broccoli': {
+                name: 'Broccoli',
+                image: 'https://images.unsplash.com/photo-1584270354949-c26b0d5b4a0c?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80',
+                temperature: '10-25°C',
+                humidity: '50-70%',
+                harvestTime: '60-90 days',
+                difficulty: 'Moderate',
+                bestMonths: ['February', 'March', 'April', 'September', 'October'],
+                tips: 'Broccoli needs rich soil and consistent moisture. Harvest the main head before it flowers.'
+            },
+            'lettuce': {
+                name: 'Lettuce',
+                image: 'https://media.istockphoto.com/id/535910387/photo/ripe-organic-green-salad-romano.jpg?s=612x612&w=0&k=20&c=9GTcj_WqUk9LWkzUb6g4MCnLTPAapT_hNMZCHRd3C1U=',
+                temperature: '10-20°C',
+                humidity: '60-70%',
+                harvestTime: '30-60 days',
+                difficulty: 'Easy',
+                bestMonths: ['March', 'April', 'May', 'September', 'October'],
+                tips: 'Lettuce grows best in cool weather. Keep soil moist and provide partial shade in hot weather.'
+            },
+            'potato': {
+                name: 'Potato',
+                image: 'https://media.istockphoto.com/id/647805874/photo/raw-organic-baby-gold-potatoes.jpg?s=612x612&w=0&k=20&c=ayj6tEFi6DsDIkZGgXoZG-Fwl__skPxKeSw-8BiZC3Y=',
+                temperature: '15-25°C',
+                humidity: '60-80%',
+                harvestTime: '90-120 days',
+                difficulty: 'Easy',
+                bestMonths: ['February', 'March', 'April', 'September', 'October'],
+                tips: 'Plant potatoes in loose, well-drained soil. Hill the soil around plants as they grow.'
+            },
+            'onion': {
+                name: 'Onion',
+                image: 'https://images.unsplash.com/photo-1561047029-3000c68339ca?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80',
+                temperature: '10-25°C',
+                humidity: '50-70%',
+                harvestTime: '90-120 days',
+                difficulty: 'Easy',
+                bestMonths: ['February', 'March', 'April', 'September', 'October'],
+                tips: 'Onions need full sun and well-drained soil. Stop watering when tops begin to fall over.'
+            }
+        };
+
+        // DOM Elements
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+        const resultContainer = document.querySelector('.result-container');
+        const loadingElement = document.querySelector('.loading');
+        const errorElement = document.querySelector('.error');
+        const vegetableNameElement = document.querySelector('.vegetable-name');
+        const vegetableImageElement = document.querySelector('.vegetable-image');
+        const temperatureElement = document.querySelector('.temperature');
+        const humidityElement = document.querySelector('.humidity');
+        const harvestTimeElement = document.querySelector('.harvest-time');
+        const difficultyElement = document.querySelector('.difficulty');
+        const growingTipsElement = document.querySelector('.growing-tips');
+        const optimalMonthsElement = document.querySelector('.optimal-months');
+
+        function toggleLoading(show) {
+            loadingElement.style.display = show ? 'block' : 'none';
+        }
+
+        function showError(message) {
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            resultContainer.style.display = 'none';
+        }
+
+        function hideError() {
+            errorElement.style.display = 'none';
+        }
+
+        function searchVegetable(vegetableName) {
+            toggleLoading(true);
+            hideError();
+            
+            // Convert to lowercase for case-insensitive search
+            const searchTerm = vegetableName.toLowerCase().trim();
+            
+            // Check if vegetable exists in database
+            if (VEGETABLE_DATABASE[searchTerm]) {
+                const vegetable = VEGETABLE_DATABASE[searchTerm];
+                updateUI(vegetable);
+            } else {
+                showError('Vegetable not found. Try Tomato, Carrot, Broccoli, Lettuce, Potato, or Onion.');
+            }
+            
+            toggleLoading(false);
+        }
+
+        function updateUI(vegetable) {
+            resultContainer.style.display = 'block';
+            
+            // Update vegetable information
+            vegetableNameElement.textContent = vegetable.name;
+            vegetableImageElement.src = vegetable.image;
+            vegetableImageElement.alt = vegetable.name;
+            temperatureElement.textContent = vegetable.temperature;
+            humidityElement.textContent = vegetable.humidity;
+            harvestTimeElement.textContent = vegetable.harvestTime;
+            difficultyElement.textContent = vegetable.difficulty;
+            growingTipsElement.textContent = vegetable.tips;
+            
+            // Update optimal months
+            optimalMonthsElement.innerHTML = vegetable.bestMonths
+                .map(month => `<span class="month-tag">${month}</span>`)
+                .join('');
+        }
+
+        // Event Listeners
+        searchButton.addEventListener('click', () => {
+            const vegetableName = searchInput.value;
+            if (vegetableName) {
+                searchVegetable(vegetableName);
+            } else {
+                showError('Please enter a vegetable name');
+            }
+        });
+
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const vegetableName = searchInput.value;
+                if (vegetableName) {
+                    searchVegetable(vegetableName);
+                } else {
+                    showError('Please enter a vegetable name');
+                }
+            }
+        });
+    </script>
+</body>
+</html> 
