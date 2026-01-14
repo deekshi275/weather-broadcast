@@ -9,6 +9,7 @@ A smart web application that combines **real-time weather updates**, a **chatbot
 - **🌍 Real-Time Weather Updates**
   - Get weather information based on your current location.
   - Includes temperature, humidity, wind speed, and rainfall data.
+  - Includes temperature, humidity, wind speed, and rainfall data.
 
 - **🤖 Smart Chatbot**
   - Ask weather-related or farming queries.
