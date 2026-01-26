@@ -68,3 +68,4 @@ This application is ideal for farmers, gardening enthusiasts, and agricultural p
 📄 License
 
 This project is open-source and available under the MIT License.
+
