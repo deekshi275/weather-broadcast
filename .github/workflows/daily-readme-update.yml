@@ -1,0 +1,70 @@
+name: Daily README update
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # runs daily at 00:00 UTC
+  workflow_dispatch: {}
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Update README with Last updated line
+        env:
+          END_DATE: '2026-02-28'
+        run: |
+          set -euo pipefail
+          TODAY=$(date -u +%F)
+          END="$END_DATE"
+          echo "Today: $TODAY, End date: $END"
+          # if today is after end date, exit without committing
+          if [[ "$TODAY" > "$END" ]]; then
+            echo "End date passed (>$END). Exiting without changes."
+            exit 0
+          fi
+
+          # Ensure README.md exists
+          if [ ! -f README.md ]; then
+            echo "README.md not found, creating with header"
+            echo "# Weather Broadcast" > README.md
+          fi
+
+          # Update or insert Last updated line at top
+          if grep -q '^Last updated:' README.md; then
+            sed -i "s/^Last updated: .*/Last updated: $TODAY/" README.md
+          else
+            # Insert line as the first line
+            sed -i "1iLast updated: $TODAY\n" README.md
+          fi
+
+          # Show diff for debugging
+          git --no-pager diff -- README.md || true
+
+      - name: Commit and push changes
+        env:
+          REPO_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
+          GIT_AUTHOR_NAME: "deekshi275"
+          GIT_AUTHOR_EMAIL: "deekshi275@users.noreply.github.com"
+        run: |
+          set -euo pipefail
+          git config user.name "$GIT_AUTHOR_NAME"
+          git config user.email "$GIT_AUTHOR_EMAIL"
+          git add README.md
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "chore: daily README update"
+          # Push using PAT so commits are authored by the token owner and count on their graph
+          git push "https://x-access-token:${REPO_TOKEN}@github.com/deekshi275/weather-broadcast.git" HEAD:main
+
+# Notes:
+# - This workflow requires a repository secret named PERSONAL_TOKEN containing a Personal Access Token (repo scope) for the GitHub user who should be credited for the commits.
+# - Add the secret at: Settings → Secrets and variables → Actions → New repository secret (Name: PERSONAL_TOKEN).
+# - The workflow will run daily until 2026-02-28 (inclusive). After that date it will exit without making changes.
+# - You can trigger the workflow manually from the Actions tab ("Run workflow") to test it immediately.
