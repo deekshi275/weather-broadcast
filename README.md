@@ -9,7 +9,7 @@ Features
   - Displays: temperature, humidity, wind speed, rainfall, and forecast.
 - Smart Chatbot Assistant
   - Ask weather- and farming-related questions.
-  - Suggests suitable vegetables and cultivation tips based on weather and season.
+  - Suggests suitable vegetables and cultiva. tion tips based on weather and season.
 - Smart Crop Suggestions
   - Enter a location to receive vegetables best suited for that region.
   - Recommendations use local climate and seasonal trends.
